@@ -107,6 +107,13 @@ if UPSTREAM_REPO and UPSTREAM_BRANCH:
         except Exception as e:
             log_error(f"Failed to fetch Gist URL: {e}")
 
+    # Preserve config.py before update (git reset --hard will remove it)
+    config_backup = None
+    if path.exists("config.py"):
+        with open("config.py", "r") as f:
+            config_backup = f.read()
+        log_info("config.py backed up before update.")
+
     # Remove old git directory
     if path.exists(".git"):
         srun(["rm", "-rf", ".git"], check=True)
@@ -125,7 +132,13 @@ if UPSTREAM_REPO and UPSTREAM_BRANCH:
         log_info(f"Successfully updated from {UPSTREAM_BRANCH} branch.")
     else:
         log_error("Something went Wrong ! Recheck your details or Ask Support !")
-        log_info(f"UPSTREAM_REPO: {UPSTREAM_REPO} | UPSTREAM_BRANCH: {UPSTREAM_BRANCH}")
+
+    # Restore config.py after update
+    if config_backup is not None:
+        with open("config.py", "w") as f:
+            f.write(config_backup)
+        log_info("config.py restored after update.")
+    log_info(f"UPSTREAM_REPO: {UPSTREAM_REPO} | UPSTREAM_BRANCH: {UPSTREAM_BRANCH}")
 else:
     log_info("UPSTREAM_REPO or UPSTREAM_BRANCH not set. Skipping update.")
 
