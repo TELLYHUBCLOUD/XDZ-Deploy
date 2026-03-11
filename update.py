@@ -17,7 +17,24 @@ from subprocess import run as srun, call as scall
 
 getLogger("pymongo").setLevel(ERROR)
 
-var_list = ['BOT_TOKEN', 'TELEGRAM_API', 'TELEGRAM_HASH', 'OWNER_ID', 'DATABASE_URL', 'BASE_URL', 'UPSTREAM_REPO', 'UPSTREAM_BRANCH']
+var_list = [
+    "BOT_TOKEN",
+    "TELEGRAM_API",
+    "TELEGRAM_HASH",
+    "OWNER_ID",
+    "DATABASE_URL",
+    "BASE_URL",
+    "UPSTREAM_REPO",
+    "UPSTREAM_BRANCH",
+    "UPDATE_PKGS",
+]
+
+if path.exists("log.txt"):
+    with open("log.txt", "r+") as f:
+        f.truncate(0)
+
+if path.exists("rlog.txt"):
+    remove("rlog.txt")
 
 basicConfig(
     format="[%(asctime)s] [%(levelname)s] - %(message)s",
@@ -25,6 +42,7 @@ basicConfig(
     handlers=[FileHandler("log.txt"), StreamHandler()],
     level=INFO,
 )
+
 try:
     settings = import_module("config")
     config_file = {
@@ -36,10 +54,16 @@ except ModuleNotFoundError:
     log_info("Config.py file is not Added! Checking ENVs..")
     config_file = {}
 
-env_updates = {key: value.strip() if isinstance(value, str) else value for key, value in environ.items() if key in var_list}
+env_updates = {
+    key: value.strip() if isinstance(value, str) else value
+    for key, value in environ.items()
+    if key in var_list
+}
 if env_updates:
     log_info("Config data is updated with ENVs!")
     config_file.update(env_updates)
+
+# -------------------- BOT TOKEN CHECK -------------------- #
 
 BOT_TOKEN = config_file.get("BOT_TOKEN", "")
 if not BOT_TOKEN:
@@ -48,10 +72,12 @@ if not BOT_TOKEN:
 
 BOT_ID = BOT_TOKEN.split(":", 1)[0]
 
+# -------------------- DATABASE SYNC -------------------- #
+
 if DATABASE_URL := config_file.get("DATABASE_URL", "").strip():
     try:
         conn = MongoClient(DATABASE_URL, server_api=ServerApi("1"))
-        db = conn.wzmlx
+        db = conn.beast
         old_config = db.settings.deployConfig.find_one({"_id": BOT_ID}, {"_id": 0})
         config_dict = db.settings.config.find_one({"_id": BOT_ID})
         if (
@@ -64,37 +90,48 @@ if DATABASE_URL := config_file.get("DATABASE_URL", "").strip():
     except Exception as e:
         log_error(f"Database ERROR: {e}")
 
+# ---------------- SAFE AUTO UPDATE SYSTEM ---------------- #
+
 UPSTREAM_REPO = config_file.get("UPSTREAM_REPO", "").strip()
-UPSTREAM_BRANCH = config_file.get("UPSTREAM_BRANCH", "").strip() or "wzv3"
+UPSTREAM_BRANCH = config_file.get("UPSTREAM_BRANCH", "").strip() or "ux1"
 
-if UPSTREAM_REPO:
+if UPSTREAM_REPO and UPSTREAM_BRANCH:
+    log_info(f"UPSTREAM_REPO: FEACH DONE  | UPSTREAM_BRANCH: {UPSTREAM_BRANCH}")
+    log_info("Starting upstream update process...")
+
+    # Handle Gist raw link
+    if "gist.githubusercontent.com" in UPSTREAM_REPO:
+        try:
+            from requests import get as rget
+            UPSTREAM_REPO = rget(UPSTREAM_REPO).text.strip()
+        except Exception as e:
+            log_error(f"Failed to fetch Gist URL: {e}")
+
+    # Remove old git directory
     if path.exists(".git"):
-        srun(["rm", "-rf", ".git"])
+        srun(["rm", "-rf", ".git"], check=True)
 
-    update = srun(
-        [
-            f"git init -q \
-                     && git config --global user.email 105407900+SilentDemonSD@users.noreply.github.com \
-                     && git config --global user.name SilentDemonSD \
-                     && git add . \
-                     && git commit -sm update -q \
-                     && git remote add origin {UPSTREAM_REPO} \
-                     && git fetch origin -q \
-                     && git reset --hard origin/{UPSTREAM_BRANCH} -q"
-        ],
-        shell=True,
+    # SAFE UPDATE COMMAND
+    update_cmd = (
+        f"git init -q && "
+        f"git remote add origin {UPSTREAM_REPO} && "
+        f"git fetch origin -q && "
+        f"git reset --hard origin/{UPSTREAM_BRANCH} -q"
     )
 
-    repo = UPSTREAM_REPO.split("/")
-    UPSTREAM_REPO = f"https://github.com/{repo[-2]}/{repo[-1]}"
+    update = srun(update_cmd, shell=True)
+
     if update.returncode == 0:
-        log_info("Successfully updated with Latest Updates !")
+        log_info(f"Successfully updated from {UPSTREAM_BRANCH} branch.")
     else:
         log_error("Something went Wrong ! Recheck your details or Ask Support !")
-    log_info(f"UPSTREAM_REPO: {UPSTREAM_REPO} | UPSTREAM_BRANCH: {UPSTREAM_BRANCH}")
+        log_info(f"UPSTREAM_REPO: {UPSTREAM_REPO} | UPSTREAM_BRANCH: {UPSTREAM_BRANCH}")
+else:
+    log_info("UPSTREAM_REPO or UPSTREAM_BRANCH not set. Skipping update.")
 
+# ---------------- PACKAGE UPDATE SYSTEM ---------------- #
 
 UPDATE_PKGS = config_file.get("UPDATE_PKGS", "True")
-if (isinstance(UPDATE_PKGS, str) and UPDATE_PKGS.lower() == "true") or UPDATE_PKGS:
+if (isinstance(UPDATE_PKGS, str) and UPDATE_PKGS.lower() == "true") or UPDATE_PKGS is True:
     scall("uv pip install -U -r requirements.txt", shell=True)
-    log_info("Successfully Updated all the Packages !")
+    log_info("Successfully Updated all the Packages!")
