@@ -1,8 +1,4 @@
 <p align="center">
-  <img width="220" src="https://i.postimg.cc/XvdvXTkS/photo-2024-12-27-11-46-15.jpg" alt="Downloader Zone Logo">
-</p>
-
-<p align="center">
   <b>Modern Telegram Mirror/Leech Bot</b><br>
   <i>Wzml-X is a powerful, modern Telegram bot for mirroring, leeching, and managing downloads to Google Drive, Telegram, or any RClone-supported cloud. Built for speed, reliability, and a beautiful user experience.</i>
 </p>
