@@ -1,4 +1,4 @@
-FROM downloaderzone/mltb
+FROM downloaderzone/mltb:latest
 
 WORKDIR /usr/src/app
 # Create a non-root user for better security
@@ -6,6 +6,13 @@ RUN useradd -m botuser && \
     chown -R botuser:botuser /usr/src/app && \
     chmod 777 /usr/src/app
 RUN uv venv --system-site-packages
+
+# Create symlinks for custom binary names used by BinConfig
+RUN ln -sf $(which qbittorrent-nox) /usr/local/bin/stormtorrent && \
+    ln -sf $(which aria2c) /usr/local/bin/blitzfetcher && \
+    ln -sf $(which ffmpeg) /usr/local/bin/mediaforge && \
+    ln -sf $(which rclone) /usr/local/bin/ghostdrive
+
 COPY requirements.txt .
 RUN uv pip install --no-cache-dir -r requirements.txt
 COPY . .
