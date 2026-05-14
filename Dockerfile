@@ -1,4 +1,4 @@
-FROM mysterysd/wzmlx:latestv3
+FROM mysterysd/wzmlx:v3
 RUN chmod 777 /usr/src/app
 
 RUN uv venv --system-site-packages
