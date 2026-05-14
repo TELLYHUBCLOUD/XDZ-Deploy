@@ -1,5 +1,5 @@
-# Use Python 3.13 slim as the base image
-FROM python:3.13-slim-bookworm
+# Use Python 3.10 slim as the base image for better compatibility with MegaSDK wheels
+FROM python:3.10-slim-bookworm
 
 # Set environment variables
 ENV PYTHONUNBUFFERED=1 \
@@ -26,8 +26,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc \
     g++ \
     make \
-    && curl -O https://mega.nz/linux/repo/xUbuntu_22.04/amd64/megacmd-xUbuntu_22.04_amd64.deb\
-    && apt-get install -y ./megacmd-xUbuntu_22.04_amd64.deb    
+    && curl -O https://mega.nz/linux/repo/xUbuntu_22.04/amd64/megacmd-xUbuntu_22.04_amd64.deb \
+    && apt-get install -y ./megacmd-xUbuntu_22.04_amd64.deb \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
