@@ -39,15 +39,15 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 ENV MEGA_SDK_VERSION=10.13.0
 
 RUN git clone --depth=1 -b v${MEGA_SDK_VERSION} https://github.com/meganz/sdk.git /home/sdk && \
-    cd /home/sdk && \
-    ./autogen.sh && \
-    ./configure \
-    --disable-silent-rules \
-    --enable-python \
-    --with-sodium \
-    --disable-examples && \
+    mkdir -p /home/sdk/build && \
+    cd /home/sdk/build && \
+    cmake .. \
+    -DENABLE_PYTHON=ON \
+    -DENABLE_JAVA=OFF \
+    -DENABLE_EXAMPLES=OFF \
+    -DUSE_CRYPTOPP=OFF && \
     make -j$(nproc) && \
-    cd bindings/python && \
+    cd ../bindings/python && \
     python3 setup.py bdist_wheel && \
     pip3 install dist/*.whl
 
