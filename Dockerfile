@@ -30,13 +30,15 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     make \
     && rm -rf /var/lib/apt/lists/*
 
-# Install MegaCMD properly for Debian 12
-RUN mkdir -p /etc/apt/keyrings && \
-    curl -fsSL https://mega.nz/keys/MEGA_signing.key | gpg --dearmor -o /etc/apt/keyrings/mega.gpg && \
-    echo "deb [signed-by=/etc/apt/keyrings/mega.gpg] https://mega.nz/linux/repo/Debian_12/ ./" > /etc/apt/sources.list.d/mega.list && \
-    apt-get update && \
-    apt-get install -y megacmd && \
-    rm -rf /var/lib/apt/lists/*
+# Installing Mega SDK Python Binding
+ENV MEGA_SDK_VERSION="10.13.0"
+RUN git clone https://github.com/meganz/sdk.git --depth=1 -b v$MEGA_SDK_VERSION ~/home/sdk \
+    && cd ~/home/sdk && rm -rf .git \
+    && autoupdate -fIv && ./autogen.sh \
+    && ./configure --disable-silent-rules --enable-python --with-sodium --disable-examples \
+    && make -j$(nproc --all) \
+    && cd bindings/python/ && python3 setup.py bdist_wheel \
+    && cd dist/ && pip3 install --no-cache-dir megasdk-$MEGA_SDK_VERSION-*.whl 
 
 # Install rclone
 RUN curl https://rclone.org/install.sh | bash
