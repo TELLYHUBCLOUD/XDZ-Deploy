@@ -26,6 +26,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc \
     g++ \
     make \
+    && curl -O https://mega.nz/linux/repo/xUbuntu_22.04/amd64/megacmd-xUbuntu_22.04_amd64.deb\
+    && apt-get install -y ./megacmd-xUbuntu_22.04_amd64.deb    
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
