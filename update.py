@@ -90,7 +90,7 @@ UPSTREAM_BRANCH = config_file.get("UPSTREAM_BRANCH", "").strip() or "master"
 
 if UPSTREAM_REPO:
     if path.exists(".git"):
-        if osname == 'nt':
+        if osname == "nt":
             srun(["rmdir", "/s", "/q", ".git"], shell=True)
         else:
             srun(["rm", "-rf", ".git"])
@@ -98,23 +98,29 @@ if UPSTREAM_REPO:
     # Set non-interactive git environment
     update_env = environ.copy()
     update_env["GIT_TERMINAL_PROMPT"] = "0"
-    
-    log_info(f"Checking for updates from {UPSTREAM_REPO} [{UPSTREAM_BRANCH}]...")
-    
+
     try:
         srun(["git", "init", "-q"], check=True)
-        srun(["git", "config", "--global", "user.email", "bot@tellyhouse.com"], check=True)
+        srun(
+            ["git", "config", "--global", "user.email", "bot@tellyhouse.com"],
+            check=True,
+        )
         srun(["git", "config", "--global", "user.name", "TellYBot"], check=True)
         srun(["git", "remote", "add", "origin", UPSTREAM_REPO], check=True)
-        
+
         # Fetch attempt
         fetch_res = srun(["git", "fetch", "origin", "-q"], env=update_env)
-        
+
         if fetch_res.returncode == 0:
-            srun(["git", "reset", "--hard", f"origin/{UPSTREAM_BRANCH}", "-q"], check=True)
+            srun(
+                ["git", "reset", "--hard", f"origin/{UPSTREAM_BRANCH}", "-q"],
+                check=True,
+            )
             log_info("Successfully updated with latest code!")
         else:
-            log_error("Failed to fetch from Upstream. Incorrect token, branch, or repo URL?")
+            log_error(
+                "Failed to fetch from Upstream. Incorrect token, branch, or repo URL?"
+            )
             log_info("Continuing with existing code...")
     except Exception as e:
         log_error(f"Update process failed: {e}")
@@ -131,6 +137,5 @@ if UPSTREAM_REPO:
 
 UPDATE_PKGS = config_file.get("UPDATE_PKGS", "True")
 if (isinstance(UPDATE_PKGS, str) and UPDATE_PKGS.lower() == "true") or UPDATE_PKGS:
-    from sys import executable
-    scall(f"{executable} -m pip install -U -r requirements.txt", shell=True)
+    scall("uv pip install -U -r requirements.txt", shell=True)
     log_info("Successfully Updated all the Packages !")
