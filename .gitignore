@@ -8,7 +8,7 @@ accounts/*
 Thumbnails/*
 rclone/*
 tokens/*
-sabnzbd/*
+mediainfo/*
 list_drives.txt
 cookies.txt
 downloads/*
