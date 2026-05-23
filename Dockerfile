@@ -1,4 +1,4 @@
-FROM tellyhubcloud/xdzmltb:dev
+FROM tellyhubcloud/xdzmltb:main
 
 WORKDIR /usr/src/app
 RUN chmod 777 /usr/src/app
