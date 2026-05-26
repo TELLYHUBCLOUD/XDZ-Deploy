@@ -1,20 +1,11 @@
 FROM tellyhubcloud/wzmlxdz:main
-
 WORKDIR /usr/src/app
+RUN chmod 777 /usr/src/app
 
-RUN apt-get update && apt-get install -y \
-    python3-venv \
-    build-essential \
-    gcc
+RUN uv venv --system-site-packages
 
 COPY requirements.txt .
-
-RUN python3 -m venv /opt/venv
-
-ENV PATH="/opt/venv/bin:$PATH"
-
-RUN pip install --upgrade pip
-RUN pip install --no-cache-dir -r requirements.txt
+RUN uv pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
