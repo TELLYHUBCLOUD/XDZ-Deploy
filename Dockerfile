@@ -1,4 +1,4 @@
-FROM tellyhubcloud/wzmlxdz:latest
+FROM tellyhubcloud/wzmlxdz:main
 WORKDIR /usr/src/app
 RUN chmod 777 /usr/src/app
 
