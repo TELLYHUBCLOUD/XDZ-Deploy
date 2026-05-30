@@ -1,4 +1,4 @@
-FROM downloaderzone/mltb:latest
+FROM tellyhubcloud/tellyhubcloud:dev
 WORKDIR /usr/src/app
 RUN chmod 777 /usr/src/app
 
