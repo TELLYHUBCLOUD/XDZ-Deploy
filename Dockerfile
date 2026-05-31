@@ -1,21 +1,15 @@
 FROM tellyhubcloud/tellyhubcloud:dev
 
-ENV DEBIAN_FRONTEND=noninteractive \
-    PYTHONUNBUFFERED=1 \
-    PIP_BREAK_SYSTEM_PACKAGES=1 \
-    LD_LIBRARY_PATH="/usr/local/lib"
+#FROM elitemind/wzmlxdz:main
 
 WORKDIR /usr/src/app
+RUN chmod 777 /usr/src/app
 
-# Copy UV binaries
-COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /usr/local/bin/
+RUN uv venv --system-site-packages
 
-# Install requirements
 COPY requirements.txt .
-RUN uv pip install --system --no-cache-dir -r requirements.txt
+RUN uv pip install --no-cache-dir -r requirements.txt
 
-# Copy app
 COPY . .
-RUN chmod -R 777 /usr/src/app
 
 CMD ["bash", "start.sh"]
