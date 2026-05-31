@@ -1,6 +1,6 @@
-FROM tellyhubcloud/tellyhubcloud:dev
+#FROM tellyhubcloud/tellyhubcloud:dev
 
-#FROM elitemind/wzmlxdz:main
+FROM elitemind/wzmlxdz:main
 
 WORKDIR /usr/src/app
 RUN chmod 777 /usr/src/app
