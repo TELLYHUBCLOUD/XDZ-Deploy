@@ -1,15 +1,15 @@
-#FROM tellyhubcloud/tellyhubcloud:dev
+FROM rir18/mltb:latest
 
-FROM elitemind/wzmlxdz:main
+WORKDIR /app
+RUN chmod 777 /app
 
-WORKDIR /usr/src/app
-RUN chmod 777 /usr/src/app
-
-RUN uv venv --system-site-packages
+RUN python3 -m venv mltbenv
 
 COPY requirements.txt .
-RUN uv pip install --no-cache-dir -r requirements.txt
+RUN mltbenv/bin/pip install --no-cache-dir -r requirements.txt
 
 COPY . .
+
+RUN sed -i 's/\r$//' *.sh
 
 CMD ["bash", "start.sh"]
