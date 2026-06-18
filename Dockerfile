@@ -4,7 +4,8 @@ WORKDIR /usr/src/app
 
 COPY requirements.txt .
 
-RUN uv pip install --system --no-cache-dir -r requirements.txt
+RUN uv venv
+RUN . .venv/bin/activate && uv pip install -r requirements.txt
 
 COPY . .
 
