@@ -1,13 +1,17 @@
-# This file is a part of NEO-WZML (github.com/irisXDR/NEO-WZML)
-
 FROM irisxdr/neo-wzml:latest
 
 WORKDIR /usr/src/app
 
-RUN chmod 777 /usr/src/app
+RUN apt-get update && apt-get install -y \
+    gcc \
+    g++ \
+    build-essential \
+    python3-dev \
+    && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .
-RUN uv pip install --no-cache-dir -r requirements.txt
+
+RUN uv pip install --system --no-cache-dir -r requirements.txt
 
 COPY . .
 
