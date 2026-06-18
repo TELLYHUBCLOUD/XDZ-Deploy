@@ -9,6 +9,8 @@ RUN apt-get update && apt-get install -y \
     python3-dev \
     && rm -rf /var/lib/apt/lists/*
 
+RUN chmod 777 /usr/src/app
+
 COPY requirements.txt .
 
 RUN uv pip install --system --no-cache-dir -r requirements.txt
