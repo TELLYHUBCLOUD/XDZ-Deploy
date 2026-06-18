@@ -1,4 +1,4 @@
-FROM irisxdr/neo-wzml:latest
+FROM tellyhubcloud/tellyhubcloud:bypass
 
 WORKDIR /usr/src/app
 
